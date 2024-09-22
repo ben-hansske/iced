@@ -1285,6 +1285,23 @@ fn run_action<P, C>(
                     let _ = window.raw.drag_window();
                 }
             }
+            window::Action::ResizeDrag(id, direction) => {
+                use window::DragResizeDirection;
+                use winit::window::ResizeDirection;
+                if let Some(window) = window_manager.get_mut(id) {
+                    let direction = match direction {
+                        DragResizeDirection::East => ResizeDirection::East,
+                        DragResizeDirection::West => ResizeDirection::West,
+                        DragResizeDirection::North => ResizeDirection::North,
+                        DragResizeDirection::South => ResizeDirection::South,
+                        DragResizeDirection::NorthEast => ResizeDirection::NorthEast,
+                        DragResizeDirection::NorthWest => ResizeDirection::NorthWest,
+                        DragResizeDirection::SouthWest => ResizeDirection::SouthWest,
+                        DragResizeDirection::SouthEast => ResizeDirection::SouthEast
+                    };
+                    let _ = window.raw.drag_resize_window(direction);
+                }
+            }
             window::Action::Resize(id, size) => {
                 if let Some(window) = window_manager.get_mut(id) {
                     let _ = window.raw.request_inner_size(

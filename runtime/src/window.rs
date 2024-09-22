@@ -39,6 +39,12 @@ pub enum Action {
     /// button was pressed immediately before this function is called.
     Drag(Id),
 
+    /// Resize the window with the left mouse button until the button is released.
+    ///
+    /// There’s no guarantee that this will work unless the left mouse
+    /// button was pressed immediately before this function is called.
+    ResizeDrag(Id, DragResizeDirection),
+
     /// Resize the window to the given logical dimensions.
     Resize(Id, Size),
 
@@ -264,6 +270,11 @@ pub fn drag<T>(id: Id) -> Task<T> {
     task::effect(crate::Action::Window(Action::Drag(id)))
 }
 
+/// Begins drag resizing the window while the left mouse button is held.
+pub fn drag_resize<T>(id: Id, resize_direction: DragResizeDirection) -> Task<T> {
+    task::effect(crate::Action::Window(Action::ResizeDrag(id, resize_direction)))
+}
+
 /// Resizes the window to the given logical dimensions.
 pub fn resize<T>(id: Id, new_size: Size) -> Task<T> {
     task::effect(crate::Action::Window(Action::Resize(id, new_size)))
@@ -433,4 +444,25 @@ pub fn enable_mouse_passthrough<Message>(id: Id) -> Task<Message> {
 /// from being passed to whatever is underneath.
 pub fn disable_mouse_passthrough<Message>(id: Id) -> Task<Message> {
     task::effect(crate::Action::Window(Action::DisableMousePassthrough(id)))
+}
+
+/// Defines the orientation that a window resize will be performed.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum DragResizeDirection {
+    /// Drag on the right window border.
+    East,
+    /// Drag on the top window border.
+    North,
+    /// Drag on the top right window corner.
+    NorthEast,
+    /// Drag on the top left window corner.
+    NorthWest,
+    /// Drag on the bottom window corner.
+    South,
+    /// Drag on the bottom right window corner.
+    SouthEast,
+    /// Drag on the bottom left window corner.
+    SouthWest,
+    /// Drag on the left window corner.
+    West,
 }
